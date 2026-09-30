@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopiGo | Ödeme</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="topbar">
+        <div class="container topbar-inner">
+            <span>Ücretsiz kargo 500₺ üzeri</span>
+            <div class="topbar-links">
+                <a href="e-ticaret.html">Alışverişe dön</a>
+                <a href="giris.html#login">Hesabım</a>
+            </div>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="container nav">
+            <a class="logo" href="e-ticaret.html">ShopiGo</a>
+            <div class="checkout-progress">
+                <span class="completed">1 Sepet</span>
+                <span class="active">2 Ödeme</span>
+                <span>3 Sipariş</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="checkout-page">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">Güvenli ödeme</span>
+                    <h1 class="checkout-title">Siparişini tamamla</h1>
+                </div>
+                <a href="sepet.html" class="link-more">Sepete dön</a>
+            </div>
+
+            <div class="checkout-layout" id="checkoutContent">
+                <form class="checkout-form" id="paymentForm">
+                    <section class="checkout-card">
+                        <div class="checkout-card-heading">
+                            <span class="step-number">1</span>
+                            <div>
+                                <h2>Teslimat bilgileri</h2>
+                                <p>Siparişinin ulaşacağı adresi gir.</p>
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <label class="form-field">Ad soyad
+                                <input type="text" name="name" placeholder="Adınız Soyadınız" required>
+                            </label>
+                            <label class="form-field">Telefon
+                                <input type="tel" name="phone" placeholder="05xx xxx xx xx" required>
+                            </label>
+                            <label class="form-field form-field-wide">Adres
+                                <textarea name="address" rows="3" placeholder="Mahalle, sokak, bina ve daire no" required></textarea>
+                            </label>
+                            <label class="form-field">İl
+                                <input type="text" name="city" placeholder="İstanbul" required>
+                            </label>
+                            <label class="form-field">Posta kodu
+                                <input type="text" name="postalCode" inputmode="numeric" placeholder="34000" required>
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="checkout-card">
+                        <div class="checkout-card-heading">
+                            <span class="step-number">2</span>
+                            <div>
+                                <h2>Ödeme yöntemi</h2>
+                                <p>Kart bilgilerin güvenli şekilde işlenir.</p>
+                            </div>
+                        </div>
+                        <div class="payment-method active">💳 Kredi / banka kartı</div>
+                        <div class="form-grid card-fields">
+                            <label class="form-field form-field-wide">Kart üzerindeki ad soyad
+                                <input type="text" name="cardName" placeholder="AD SOYAD" required>
+                            </label>
+                            <label class="form-field form-field-wide">Kart numarası
+                                <input type="text" name="cardNumber" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" required>
+                            </label>
+                            <label class="form-field">Son kullanma tarihi
+                                <input type="text" name="expiry" maxlength="5" placeholder="AA/YY" required>
+                            </label>
+                            <label class="form-field">CVV
+                                <input type="password" name="cvv" inputmode="numeric" maxlength="3" placeholder="123" required>
+                            </label>
+                        </div>
+                        <p class="secure-note">🔒 Bilgilerin güvenli bağlantı üzerinden korunur.</p>
+                    </section>
+
+                    <p class="checkout-message" id="checkoutMessage"></p>
+                    <button type="submit" class="btn btn-primary full-width">Siparişi tamamla</button>
+                </form>
+
+                <aside class="checkout-summary checkout-card">
+                    <h2>Sipariş özeti</h2>
+                    <div id="checkoutItems"></div>
+                    <div class="summary-row"><span>Ara toplam</span><strong id="checkoutSubtotal">0 ₺</strong></div>
+                    <div class="summary-row"><span>Kargo</span><strong id="checkoutShipping">0 ₺</strong></div>
+                    <div class="summary-row"><span>İndirim</span><strong id="checkoutDiscount">-0 ₺</strong></div>
+                    <div class="summary-row total"><span>Toplam</span><strong id="checkoutTotal">0 ₺</strong></div>
+                </aside>
+            </div>
+
+            <div class="order-success" id="orderSuccess" hidden>
+                <div class="success-icon">✓</div>
+                <h2>Siparişin alındı</h2>
+                <p>Sipariş numaran: <strong id="orderNumber"></strong></p>
+                <a href="e-ticaret.html" class="btn btn-primary">Alışverişe dön</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const cartKey = 'shopigo-cart';
+        const readCart = () => {
+            try { return JSON.parse(localStorage.getItem(cartKey) || '[]'); } catch (error) { return []; }
+        };
+        const formatPrice = (value) => `${new Intl.NumberFormat('tr-TR').format(value)} ₺`;
+        const cart = readCart();
+        const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const shipping = subtotal > 0 ? 149 : 0;
+        const discount = subtotal >= 3000 ? 299 : 0;
+        const total = subtotal + shipping - discount;
+
+        document.getElementById('checkoutItems').innerHTML = cart.map((item) => `
+            <div class="checkout-item"><span>${item.name} <small>x${item.quantity}</small></span><strong>${formatPrice(item.price * item.quantity)}</strong></div>
+        `).join('');
+        document.getElementById('checkoutSubtotal').textContent = formatPrice(subtotal);
+        document.getElementById('checkoutShipping').textContent = formatPrice(shipping);
+        document.getElementById('checkoutDiscount').textContent = `-${formatPrice(discount)}`;
+        document.getElementById('checkoutTotal').textContent = formatPrice(total);
+
+        document.getElementById('paymentForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+            if (!cart.length) {
+                document.getElementById('checkoutMessage').textContent = 'Ödeme için sepetinize ürün ekleyin.';
+                document.getElementById('checkoutMessage').className = 'checkout-message error';
+                return;
+            }
+            document.getElementById('checkoutContent').hidden = true;
+            document.getElementById('orderNumber').textContent = `SP-${Date.now().toString().slice(-6)}`;
+            document.getElementById('orderSuccess').hidden = false;
+            localStorage.removeItem(cartKey);
+        });
+    </script>
+</body>
+</html>

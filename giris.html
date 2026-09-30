@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopiGo | Giriş Yap</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="topbar">
+        <div class="container topbar-inner">
+            <span>Ücretsiz kargo 500₺ üzeri</span>
+            <div class="topbar-links">
+                <a href="e-ticaret.html">Alışverişe dön</a>
+                <a href="sepet.html">Sepet</a>
+            </div>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="container nav">
+            <a class="logo" href="e-ticaret.html">ShopiGo</a>
+            <div class="header-actions">
+                <a href="e-ticaret.html">Anasayfa</a>
+                <a href="sepet.html" class="cart-badge">Sepet</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="auth-page">
+        <div class="container auth-layout">
+            <section class="auth-intro">
+                <span class="eyebrow">ShopiGo hesabı</span>
+                <h1>Alışverişe kaldığın yerden devam et.</h1>
+                <p>Hesabına giriş yaparak siparişlerini takip et, sepetini koru ve sana özel fırsatları kaçırma.</p>
+            </section>
+
+            <section class="auth-card">
+                <div class="auth-tabs" role="tablist" aria-label="Hesap işlemleri">
+                    <button type="button" class="auth-tab active" data-target="login" role="tab">Giriş yap</button>
+                    <button type="button" class="auth-tab" data-target="register" role="tab">Kayıt ol</button>
+                </div>
+
+                <form class="auth-form" id="login" data-form="login">
+                    <h2>Tekrar hoş geldin</h2>
+                    <label class="form-field">E-posta
+                        <input type="email" name="email" placeholder="ornek@mail.com" required>
+                    </label>
+                    <label class="form-field">Şifre
+                        <input type="password" name="password" minlength="6" placeholder="En az 6 karakter" required>
+                    </label>
+                    <p class="auth-message" data-message="login"></p>
+                    <button type="submit" class="btn btn-primary full-width">Giriş yap</button>
+                </form>
+
+                <form class="auth-form" id="register" data-form="register" hidden>
+                    <h2>Yeni hesap oluştur</h2>
+                    <label class="form-field">Ad soyad
+                        <input type="text" name="name" placeholder="Adınız Soyadınız" required>
+                    </label>
+                    <label class="form-field">E-posta
+                        <input type="email" name="email" placeholder="ornek@mail.com" required>
+                    </label>
+                    <label class="form-field">Şifre
+                        <input type="password" name="password" minlength="6" placeholder="En az 6 karakter" required>
+                    </label>
+                    <p class="auth-message" data-message="register"></p>
+                    <button type="submit" class="btn btn-primary full-width">Kayıt ol</button>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const accountKey = 'shopigo-account';
+        const tabs = document.querySelectorAll('.auth-tab');
+        const forms = document.querySelectorAll('[data-form]');
+
+        function showForm(target) {
+            tabs.forEach((tab) => tab.classList.toggle('active', tab.dataset.target === target));
+            forms.forEach((form) => { form.hidden = form.dataset.form !== target; });
+            window.history.replaceState(null, '', `#${target}`);
+        }
+
+        function setMessage(type, text, status) {
+            const message = document.querySelector(`[data-message="${type}"]`);
+            message.textContent = text;
+            message.className = `auth-message ${status}`;
+        }
+
+        tabs.forEach((tab) => tab.addEventListener('click', () => showForm(tab.dataset.target)));
+
+        document.querySelector('[data-form="register"]').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const data = new FormData(event.currentTarget);
+            const account = {
+                name: data.get('name').trim(),
+                email: data.get('email').trim().toLowerCase(),
+                password: data.get('password')
+            };
+            localStorage.setItem(accountKey, JSON.stringify(account));
+            event.currentTarget.reset();
+            showForm('login');
+            setMessage('login', 'Kaydınız tamamlandı. Şimdi giriş yapabilirsiniz.', 'success');
+        });
+
+        document.querySelector('[data-form="login"]').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const data = new FormData(event.currentTarget);
+            const account = JSON.parse(localStorage.getItem(accountKey) || 'null');
+            const email = data.get('email').trim().toLowerCase();
+
+            if (!account || account.email !== email || account.password !== data.get('password')) {
+                setMessage('login', 'E-posta veya şifre hatalı.', 'error');
+                return;
+            }
+
+            localStorage.setItem('shopigo-session', JSON.stringify({ name: account.name, email: account.email }));
+            window.location.href = 'e-ticaret.html';
+        });
+
+        function showFormFromHash() {
+            showForm(window.location.hash === '#register' ? 'register' : 'login');
+        }
+
+        window.addEventListener('hashchange', showFormFromHash);
+        showFormFromHash();
+    </script>
+</body>
+</html>

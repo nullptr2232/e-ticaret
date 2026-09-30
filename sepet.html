@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopiGo | Sepet</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="topbar">
+        <div class="container topbar-inner">
+            <span>Ücretsiz kargo 500₺ üzeri</span>
+            <div class="topbar-links">
+                <a href="#">İndirimler</a>
+                <a href="#">Yardım</a>
+                <a href="#">İletişim</a>
+            </div>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="container nav">
+            <div class="logo">ShopiGo</div>
+
+            <div class="search">
+                <span>⌕</span>
+                <input type="text" placeholder="Ürün ara..." />
+            </div>
+
+            <div class="header-actions">
+                <a href="giris.html#login">Giriş Yap</a>
+                <a href="giris.html#register">Kaydol</a>
+                <a href="sepet.html" class="cart-badge">Sepet</a>
+            </div>
+        </div>
+
+        <nav class="main-nav">
+            <div class="container">
+                <a href="e-ticaret.html">Anasayfa</a>
+                <a href="elektronik.html">Elektronik</a>
+                <a href="moda.html">Moda</a>
+                <a href="ev-yasam.html">Ev & Yaşam</a>
+                <a href="kozmetik.html">Kozmetik</a>
+                <a href="spor.html">Spor</a>
+                <a href="aksesuar.html">Aksesuar</a>
+                <a href="ayakkabı-canta.html">Ayakkabı & Canta</a>
+                <a href="annecocuk.html">Anne & Çocuk</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="cart-page">
+        <div class="container">
+            <div class="section-head">
+                <h2>Sepetim</h2>
+                <a href="e-ticaret.html" class="link-more">Alışverişe devam et</a>
+            </div>
+
+            <div class="cart-layout">
+                <div class="cart-items" id="cartItems"></div>
+
+                <aside class="cart-summary">
+                    <h3>Özet</h3>
+
+                    <div class="summary-row">
+                        <span>Ara toplam</span>
+                        <strong id="subtotal">0 ₺</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span>Kargo</span>
+                        <strong id="shipping">0 ₺</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span>İndirim</span>
+                        <strong id="discount">-0 ₺</strong>
+                    </div>
+
+                    <div class="summary-row total">
+                        <span>Toplam</span>
+                        <strong id="total">0 ₺</strong>
+                    </div>
+
+                    <a href="odeme.html" class="btn btn-primary full-width checkout-link">Ödemeye geç</a>
+                    <button type="button" class="btn btn-secondary full-width">Kupon kullan</button>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div>
+                <div class="logo">ShopiGo</div>
+                <p>Modern alışveriş deneyimi için tasarlanmış, kullanıcı dostu e-ticaret arayüzü.</p>
+            </div>
+
+            <div>
+                <h4>Şirket</h4>
+                <ul>
+                    <li>Hakkımızda</li>
+                    <li>İletişim</li>
+                    <li>Kariyer</li>
+                </ul>
+            </div>
+
+            <div>
+                <h4>Yardım</h4>
+                <ul>
+                    <li>Sipariş Takibi</li>
+                    <li>İade</li>
+                    <li>Ödeme</li>
+                </ul>
+            </div>
+
+            <div>
+                <h4>İletişim</h4>
+                <ul>
+                    <li>support@shopigo.com</li>
+                    <li>+90 555 123 45 67</li>
+                    <li>İstanbul, Türkiye</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const cartKey = 'shopigo-cart';
+
+        const readCart = () => {
+            try {
+                return JSON.parse(localStorage.getItem(cartKey) || '[]');
+            } catch (error) {
+                return [];
+            }
+        };
+
+        const writeCart = (items) => {
+            localStorage.setItem(cartKey, JSON.stringify(items));
+        };
+
+        const formatPrice = (value) => `${new Intl.NumberFormat('tr-TR').format(value)} ₺`;
+
+        const getProductMeta = (item) => {
+            const electronicsImages = {
+                'Casper Nirvana S100': 's100_listegörseli.webp',
+                'Leitz Phone 2': 'phone-2-leitz.jpg',
+                'Casper Nirvana P40': 'p40-liste-gorseli_op.webp',
+                'iPhone 17 Pro Max': 'iphone-17-pro-max-silver-260nw-2687789603.webp',
+                'Vivo V Serisi': 'images.jpg',
+                'Asus Vivobook': 'ASSET_MP_179167347.webp',
+                'Samsung Galaxy S25+': '6798f04c0c2804.41970111_enmhopjfqiklg_cropped_288.webp',
+                'MODAMİNEM Kadın Fırfır Detaylı Mini Elbise': 'https://cdn.dsmcdn.com/mnresize/620/920/ty1797/prod/QC_PREP/20251213/19/4b3abcdd-9d6a-3441-8997-5481b15dda59/1_org_zoom.jpg',
+                'Kokosh Monaco Uzun Abiye Elbise': 'https://cdn.dsmcdn.com/mnresize/620/920/ty1939/prod/QC_PREP/20260702/11/ce237ffe-b28c-397c-b85c-4e6438b80d98/1_org_zoom.jpg',
+                'Mivoon Oşho Modal Alt Üst Takım': 'https://cdn.dsmcdn.com/mnresize/620/920/ty1916/prod/QC_ENRICHMENT/20260813/15/9c8e9cfe-7524-3621-a64a-7e6c8105c786/1_org_zoom.jpg',
+                'Sabri Özel Mono Yaka Takım Elbise': 'https://cdn.dsmcdn.com/mnresize/620/920/ty1720/prod/QC_ENRICHMENT/20250807/16/da02e69a-b981-3e85-b1c3-a58aa30289e7/1_org_zoom.jpg',
+                'Aytuğ&Mısırlı Modal Pijama Takımı': 'https://cdn.dsmcdn.com/mnresize/620/920/ty1918/prod/QC_PREP/20260804/16/44d732ea-8492-32ca-b262-5b9e2c2a9ba7/1_org_zoom.jpg',
+                'Kokosh Desenli Uzun Elbise': 'https://cdn.dsmcdn.com/mnresize/620/920/ty1950/prod/QC_PREP/20260902/12/b5ee1aea-6f57-365a-a317-dd29e96132e2/1_org_zoom.jpg',
+                'Wega Moda Puffy Cherry Atkı Şal': 'https://cdn.dsmcdn.com/mnresize/620/920/ty1808/prod/QC_PREP/20251229/22/4f117052-daaf-347b-90a8-f37570ce8841/1_org_zoom.jpg',
+                'Orvila 5 Bölmeli Metal Elbise Askısı': 'https://cdn.dsmcdn.com/mnresize/620/920/ty1600/prod/QC/20241109/23/cc7cf7f8-1357-3365-a0e9-9422a6b63183/1_org_zoom.jpg',
+                "BEYZANA Pencraft 24'lü Marker Seti": 'https://cdn.dsmcdn.com/mnresize/620/920/ty1810/prod/QC_ENRICHMENT/20260112/15/9818019d-be0a-304d-afee-62b75b8e85d5/1_org_zoom.jpg',
+                "Serstil 6'lı Çekmece Düzenleyici Set": 'https://cdn.dsmcdn.com/mnresize/620/920/ty1786/prod/QC_PREP/20251105/13/14ae6610-1e24-3404-ab6b-a3d6dcbc2788/1_org_zoom.jpg',
+                'Magly 72 Parçalı Manyetik Yapı Blokları': 'https://cdn.dsmcdn.com/mnresize/620/920/ty1602/prod/QC/20241118/16/18962b5a-dc5e-3472-b1bb-56962270878a/1_org_zoom.jpg',
+                'ACAR 9 Parça Rendeli Saklama Kabı Seti': 'https://cdn.dsmcdn.com/mnresize/620/920/ty1898/prod/QC_ENRICHMENT/20260722/09/69098ab4-b0d6-368b-802a-eeda8d713705/1_org_zoom.jpg',
+                'Şarjlı Mantar Masa Lambası': 'https://cdn.dsmcdn.com/mnresize/620/920/ty1844/prod/QC_PREP/20260324/12/27672665-5063-36c5-843a-74c5380fd37d/1_org_zoom.jpg',
+                'LumenaScent Liora Kadın Parfüm': 'https://cdn.dsmcdn.com/mnresize/620/920/ty1901/prod/QC_ENRICHMENT/20260727/11/3e9159d2-4c2c-3e7e-ba47-223c5f206d8a/1_org_zoom.jpg',
+                'Embeauty 9 Aktifli Şampuan': 'https://cdn.dsmcdn.com/mnresize/620/920/ty1630/product/media/images/prod/PIM/20250124/17/ce19fda6-2bac-42e8-9573-01e20bd89c54/1_org_zoom.jpg',
+                'VULLY 24K Yüz Temizleme Jeli': 'https://cdn.dsmcdn.com/mnresize/620/920/ty1727/prod/QC_ENRICHMENT/20250814/18/108d5a46-3fc9-31a0-ab9e-34f0baff8df3/1_org_zoom.jpg',
+                'Embeauty Ultra Siyah Dolgunlaştırıcı Maskara – Hacim ve Uzunluk Etkili': 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=black%20mascara%20tube%20product%20photo%20on%20white%20background%20professional%20e-commerce%20cosmetic&image_size=square_hd'
+            };
+
+            if (item.name === 'Smart Watch X') return { emoji: '⌚', text: 'Gümüş / 42mm', accent: false };
+            if (item.name === 'Glow Serum') return { emoji: '🧴', text: '50 ml • Cilt bakımı', accent: true };
+            if (item.name === 'Minimal Chair') return { emoji: '🪑', text: 'Minimal tasarım', accent: false };
+            if (item.name === 'MODAMİNEM Kadın Fırfır Detaylı Mini Elbise') return { image: item.image || electronicsImages[item.name], text: 'Kadın elbise', accent: false };
+            if (item.name === 'Kokosh Monaco Uzun Abiye Elbise') return { image: item.image || electronicsImages[item.name], text: 'Kadın abiye', accent: false };
+            if (item.name === 'Mivoon Oşho Modal Alt Üst Takım') return { image: item.image || electronicsImages[item.name], text: 'Büyük beden takım', accent: false };
+            if (item.name === 'Sabri Özel Mono Yaka Takım Elbise') return { image: item.image || electronicsImages[item.name], text: 'Erkek takım elbise', accent: false };
+            if (item.name === 'Aytuğ&Mısırlı Modal Pijama Takımı') return { image: item.image || electronicsImages[item.name], text: 'Erkek ev giyim', accent: false };
+            if (item.name === 'Kokosh Desenli Uzun Elbise') return { image: item.image || electronicsImages[item.name], text: 'Kadın elbise', accent: false };
+            if (item.name === 'Wega Moda Puffy Cherry Atkı Şal') return { image: item.image || electronicsImages[item.name], text: 'Aksesuar', accent: false };
+            if (item.name === 'Orvila 5 Bölmeli Metal Elbise Askısı') return { image: item.image || electronicsImages[item.name], text: 'Ev & Yaşam', accent: false };
+            if (item.name === "BEYZANA Pencraft 24'lü Marker Seti") return { image: item.image || electronicsImages[item.name], text: 'Kırtasiye & hobi', accent: false };
+            if (item.name === "Serstil 6'lı Çekmece Düzenleyici Set") return { image: item.image || electronicsImages[item.name], text: 'Ev & Yaşam', accent: false };
+            if (item.name === 'Magly 72 Parçalı Manyetik Yapı Blokları') return { image: item.image || electronicsImages[item.name], text: 'Eğitici oyuncak', accent: false };
+            if (item.name === 'ACAR 9 Parça Rendeli Saklama Kabı Seti') return { image: item.image || electronicsImages[item.name], text: 'Sofra & mutfak', accent: false };
+            if (item.name === 'Şarjlı Mantar Masa Lambası') return { image: item.image || electronicsImages[item.name], text: 'Aydınlatma', accent: false };
+            if (item.name === 'LumenaScent Liora Kadın Parfüm') return { image: item.image || electronicsImages[item.name], text: 'Kozmetik', accent: false };
+            if (item.name === 'Embeauty 9 Aktifli Şampuan') return { image: item.image || electronicsImages[item.name], text: 'Saç bakım', accent: false };
+            if (item.name === 'VULLY 24K Yüz Temizleme Jeli') return { image: item.image || electronicsImages[item.name], text: 'Yüz bakım', accent: false };
+            if (item.name === 'Embeauty Ultra Siyah Dolgunlaştırıcı Maskara – Hacim ve Uzunluk Etkili') return { image: item.image || electronicsImages[item.name], text: 'Makyaj', accent: false };
+            return { image: item.image || electronicsImages[item.name], text: '', accent: false };
+        };
+
+        function updateBadge() {
+            const cart = readCart();
+            const totalItems = cart.reduce((sum, item) => sum + Number(item.quantity || 1), 0);
+            const cartBadge = document.querySelector('.cart-badge');
+
+            if (!cartBadge) return;
+
+            if (!cartBadge.querySelector('.cart-count')) {
+                const badge = document.createElement('span');
+                badge.className = 'cart-count';
+                cartBadge.appendChild(badge);
+            }
+
+            const badge = cartBadge.querySelector('.cart-count');
+            badge.textContent = totalItems;
+            cartBadge.classList.toggle('has-items', totalItems > 0);
+        }
+
+        function renderCart() {
+            const cart = readCart();
+            const cartItems = document.getElementById('cartItems');
+            const subtotalEl = document.getElementById('subtotal');
+            const shippingEl = document.getElementById('shipping');
+            const discountEl = document.getElementById('discount');
+            const totalEl = document.getElementById('total');
+
+            if (!cart.length) {
+                cartItems.innerHTML = `
+                    <div class="empty-cart">
+                        <h3>Sepetiniz boş</h3>
+                        <p>Henüz eklediğiniz ürün yok. Ürünleri inceleyip sepete ekleyebilirsiniz.</p>
+                        <a href="e-ticaret.html" class="btn btn-primary" style="margin-top: 16px;">Alışverişe başla</a>
+                    </div>
+                `;
+                subtotalEl.textContent = '0 ₺';
+                shippingEl.textContent = '0 ₺';
+                discountEl.textContent = '-0 ₺';
+                totalEl.textContent = '0 ₺';
+                updateBadge();
+                return;
+            }
+
+            cartItems.innerHTML = cart.map((item) => {
+                const meta = getProductMeta(item);
+                const totalPrice = item.price * item.quantity;
+                return `
+                    <article class="cart-item" data-name="${item.name}" data-price="${item.price}">
+                        <div class="cart-thumb ${meta.accent ? 'accent' : ''}">${meta.image ? `<img src="${meta.image}" alt="${item.name}">` : meta.emoji}</div>
+                        <div class="cart-info">
+                            <h3>${item.name}</h3>
+                            <p>${meta.text}</p>
+                            <div class="cart-meta">
+                                <span>Stokta var</span>
+                                <button type="button" class="remove-item">Sil</button>
+                            </div>
+                        </div>
+                        <div class="quantity-control" aria-label="Ürün adedi">
+                            <button type="button" class="decrease-item">−</button>
+                            <span>${item.quantity}</span>
+                            <button type="button" class="increase-item">+</button>
+                        </div>
+                        <div class="item-price">${formatPrice(totalPrice)}</div>
+                    </article>
+                `;
+            }).join('');
+
+            const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            const shipping = subtotal > 0 ? 149 : 0;
+            const discount = subtotal >= 3000 ? 299 : 0;
+            const total = subtotal + shipping - discount;
+
+            subtotalEl.textContent = formatPrice(subtotal);
+            shippingEl.textContent = formatPrice(shipping);
+            discountEl.textContent = `-${formatPrice(discount)}`;
+            totalEl.textContent = formatPrice(total);
+            updateBadge();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCart();
+
+            document.addEventListener('click', (event) => {
+                const target = event.target;
+                if (!target.closest('.increase-item') && !target.closest('.decrease-item') && !target.closest('.remove-item')) {
+                    return;
+                }
+
+                const itemCard = target.closest('.cart-item');
+                if (!itemCard) return;
+
+                const cart = readCart();
+                const productName = itemCard.dataset.name;
+                const itemIndex = cart.findIndex((item) => item.name === productName);
+
+                if (itemIndex === -1) return;
+
+                if (target.closest('.increase-item')) {
+                    cart[itemIndex].quantity += 1;
+                }
+
+                if (target.closest('.decrease-item')) {
+                    cart[itemIndex].quantity -= 1;
+                    if (cart[itemIndex].quantity <= 0) {
+                        cart.splice(itemIndex, 1);
+                    }
+                }
+
+                if (target.closest('.remove-item')) {
+                    cart.splice(itemIndex, 1);
+                }
+
+                writeCart(cart);
+                renderCart();
+            });
+        });
+    </script>
+</body>
+</html>
